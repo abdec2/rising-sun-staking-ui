@@ -11,27 +11,16 @@ export const AppReducer = (state, action) => {
                 account: action.payload
             }
 
-        case 'UPDATE_BNB_BALANCE':
-            return {
-                ...state,
-                bnbBalance: action.payload
-            }
-        
-        case 'UPDATE_TOKEN_BALANCE':
-            return {
-                ...state,
-                tokenBalance: action.payload
-            }
-
-        case 'UPDATE_ICO_RATE':
-            return {
-                ...state,
-                rate: action.payload
-            }
         case 'UPDATE_PROVIDER':
             return {
                 ...state,
                 web3Provider: action.payload
+            }
+        
+        case "UPDATE_NFTS":
+            return {
+                ...state, 
+                ownedNFTs: action.payload
             }
         default:
             return state;

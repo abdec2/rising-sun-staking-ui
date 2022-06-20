@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
-import { GlobalContext } from '../context/GlobalContext';
-import CONFIG from './../abi/config.json';
-import contractAbi from './../abi/abi.json';
+import { GlobalContext } from '../../context/GlobalContext';
+import CONFIG from './../../abi/config.json';
+import contractAbi from './../../abi/abi.json';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useContext, useEffect } from 'react';
 
@@ -25,7 +25,7 @@ const styleobj = {
 }
 
 const Main = ({ setError, setErrMsg }) => {
-  const { account, web3Provider, fetchAccountData, delAccount, addAccount, updateProvider } = useContext(GlobalContext);
+  const { account, addAccount, updateProvider } = useContext(GlobalContext);
 
   const connectWallet = async () => {
     try {
@@ -45,7 +45,6 @@ const Main = ({ setError, setErrMsg }) => {
       } else {
         setError(false)
         setErrMsg('')
-
       }
     } catch (e) {
       console.log(e)
@@ -72,11 +71,7 @@ const Main = ({ setError, setErrMsg }) => {
         <p data-w-id="f70c0a51-08da-0411-b870-daee4d757f7e" style={{ opacity: 0 }} className="typo-mint-content">You can buy ETH directly through Metamask or you can transfer some from another wallet or crypto exchange.</p>
         <a data-w-id="50077320-d150-c3b1-99d4-af4e6fb8fa39" style={{ opacity: 0 }} href="#" className="primary-button w-button" onClick={connectWallet}>CONNECT WALLET</a>
       </div>
-      {/* <div className="footer-madeby mobile">
-      <p className="typo-footer dark">Website by</p>
-      <a href="https://www.dearfuture.agency/" className="typo-footer footer-link">dear future</a>
-    </div>
-    <div className="section-background mint"></div> */}
+
     </section>
   )
 }
