@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CONFIG from './../abi/config.json'
 
-const useFetchNFT = (account) => {
+const useFetchNFT = (account, fetchNFTs, setFetchNFTs) => {
     const [nft, setNFT] = useState(null)
     const fetchWalletNFTs = async (account) => {
         try {
@@ -13,16 +13,20 @@ const useFetchNFT = (account) => {
                 })
                 const response = await nfts.json();
                 setNFT(response)
+                setFetchNFTs(false)
             }
           
         } catch(e) {
             console.log(e)
+            setFetchNFTs(false)
         }
     }
 
     useEffect(()=>{
-        fetchWalletNFTs(account)
-    }, [account])
+        if (fetchNFTs) {
+            fetchWalletNFTs(account)
+        }
+    }, [account, fetchNFTs])
 
     return nft
 
