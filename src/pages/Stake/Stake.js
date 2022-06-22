@@ -7,6 +7,12 @@ import CONFIG from './../../abi/config.json'
 import contractABI from './../../abi/abi.json'
 import nftAbi from './../../abi/nft.json'
 import useStakedNFT from "../../hooks/useStakedNFT"
+import LoadingComponent from "../../components/LoadingComponent"
+
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal)
 
 const style1 = {
     WebkitTransform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)",
@@ -99,8 +105,18 @@ const Stake = () => {
 
     const approveNFT = async () => {
         try {
+            setLoading(true)
             if (selectedNFTs.length === 0) {
-                alert('no nft selected to stake')
+                MySwal.fire({
+                    position: 'top-end',
+                    title: 'Error!',
+                    text: 'No nft selected to stake',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                // alert('no nft selected to stake')
+                setLoading(false)
                 return;
             }
             const signer = web3Provider.getSigner()
@@ -123,9 +139,19 @@ const Stake = () => {
 
     const stakeNfts = async () => {
         try {
+            setLoading(true)
             console.log(selectedNFTs)
             if (selectedNFTs.length === 0) {
-                alert('no nft selected to stake')
+                MySwal.fire({
+                    position: 'top-end',
+                    title: 'Error!',
+                    text: 'No nft selected to stake',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                // alert('no nft selected to stake')
+                setLoading(false)
                 return;
             }
             const signer = web3Provider.getSigner()
@@ -139,7 +165,15 @@ const Stake = () => {
             await stakingTx.wait()
             setFetchNfts(true)
             setLoading(false)
-            alert('staking done')
+            MySwal.fire({
+                position: 'top-end',
+                title: 'success',
+                text: 'Staking done',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            // alert('staking done')
             setSelectedNFTs([])
             clearCheckboxes()
 
@@ -154,9 +188,19 @@ const Stake = () => {
 
     const unStake = async() => {
         try {
+            setLoading(true)
             console.log(selectedStNFTs)
             if (selectedStNFTs.length === 0) {
-                alert('no nft selected to unstake')
+                MySwal.fire({
+                    position: 'top-end',
+                    title: 'Error!',
+                    text: 'No nft selected to unstake',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                // alert('no nft selected to unstake')
+                setLoading(false)
                 return;
             }
             const signer = web3Provider.getSigner()
@@ -170,7 +214,15 @@ const Stake = () => {
             await stakingTx.wait()
             setFetchNfts(true)
             setLoading(false)
-            alert('staking done')
+            MySwal.fire({
+                position: 'top-end',
+                title: 'success',
+                text: 'Unstaking done',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            // alert('staking done')
             setSelectedStNFTs([])
             clearCheckboxes()
 
@@ -185,6 +237,7 @@ const Stake = () => {
 
     return (
         <>
+            {loading && (<LoadingComponent />)}
             <section className="stake-and-earn-connected wf-section">
                 <h2 data-w-id="638e3a75-1253-8367-0636-0a1cb9fe5d04" style={style1} className="main-title connected">STAKE and earn</h2>
                 <div data-w-id="584c57f4-5178-0bf2-1a84-17853597b257" style={{ opacity: 0 }} className="tabs-holder">
