@@ -12,7 +12,6 @@ function App() {
   const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-wf-page','626bab4ccdd51fc2c2800bf5')
     window.Webflow && window.Webflow.destroy();
     window.Webflow && window.Webflow.ready();
     window.Webflow && window.Webflow.require('ix2').init();

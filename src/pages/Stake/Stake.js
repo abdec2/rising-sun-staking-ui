@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext} from "react"
+import { useEffect, useState, useContext } from "react"
 import { GlobalContext } from "../../context/GlobalContext"
 import classNames from "classnames"
 import useFetchNFT from "../../hooks/useFetchNFT"
@@ -6,12 +6,13 @@ import { ethers } from "ethers"
 import CONFIG from './../../abi/config.json'
 import contractABI from './../../abi/abi.json'
 import nftAbi from './../../abi/nft.json'
+import useStakedNFT from "../../hooks/useStakedNFT"
 
 const style1 = {
     WebkitTransform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)",
     MozTransform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)",
     msTransform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)",
-    transform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)", 
+    transform: "translate3d(0, 100px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(3deg) skew(0, 0)",
     opacity: 0
 }
 
@@ -19,7 +20,7 @@ const style2 = {
     WebkitTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     MozTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     msTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
-    transform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)", 
+    transform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     transformStyle: "preserve-3d",
     opacity: 1
 }
@@ -28,24 +29,27 @@ const style3 = {
     WebkitTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     MozTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     msTransform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
-    transform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)", 
+    transform: "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0deg) rotateZ(0) skew(0, 0)",
     transformStyle: "preserve-3d",
     opacity: 0
 }
 
 const Stake = () => {
-    const {account, web3Provider} = useContext(GlobalContext)
-    const [fetchNFTs, setFetchNfts] = useState(true) 
+    const { account, web3Provider } = useContext(GlobalContext)
+    const [fetchNFTs, setFetchNfts] = useState(true)
     const nfts = useFetchNFT(account, fetchNFTs, setFetchNfts)
+    const stNfts = useStakedNFT(web3Provider, account, fetchNFTs, setFetchNfts)
     const [selectedPeriod, setSelectedPeriod] = useState(0);
     const [loading, setLoading] = useState(false)
     const [selectedNFTs, setSelectedNFTs] = useState([])
+    const [selectedStNFTs, setSelectedStNFTs] = useState([])
 
-    console.log(nfts)
+
+    console.log(stNfts)
     const checkBoxClick = (e, tokenId) => {
         console.log(parseInt(tokenId, 16))
         const imageDisplay = e.target.querySelector('img').style.display;
-        if(imageDisplay !== "none") {
+        if (imageDisplay !== "none") {
             e.target.querySelector('img').style.display = "none"
             setSelectedNFTs([...selectedNFTs.filter(nft => nft !== parseInt(tokenId, 16))])
         } else {
@@ -54,32 +58,48 @@ const Stake = () => {
         }
     }
 
+
+    const checkBoxClickStaked = (e, tokenId) => {
+        console.log(parseInt(tokenId, 16))
+        const imageDisplay = e.target.querySelector('img').style.display;
+        if (imageDisplay !== "none") {
+            e.target.querySelector('img').style.display = "none"
+            setSelectedStNFTs([...selectedStNFTs.filter(nft => nft !== parseInt(tokenId, 16))])
+        } else {
+            e.target.querySelector('img').style.display = "block"
+            setSelectedStNFTs([...selectedStNFTs, parseInt(tokenId, 16)])
+        }
+    }
+
     const clearCheckboxes = () => {
         Array.from(document.querySelector('.stake-nfts').querySelectorAll('img.image-tick')).map(item => {
             item.style.display = "none"
         })
+        Array.from(document.querySelector('.staked').querySelectorAll('img.image-tick')).map(item => {
+            item.style.display = "none"
+        })
     }
 
-    const checkApproval = async() => {
+    const checkApproval = async () => {
         try {
             setLoading(true)
             const signer = web3Provider.getSigner()
             const nftContract = new ethers.Contract(CONFIG.NFT_CONTRACT, nftAbi, signer)
             const isApproval = await nftContract.isApprovedForAll(account, CONFIG.STAKING_CONTRACT_ADDRESS)
-            if(isApproval) {
+            if (isApproval) {
                 stakeNfts()
             } else {
                 approveNFT()
             }
-        } catch(e) {
+        } catch (e) {
             setLoading(false)
             console.log(e)
         }
     }
 
-    const approveNFT = async() => {
+    const approveNFT = async () => {
         try {
-            if(selectedNFTs.length === 0) {
+            if (selectedNFTs.length === 0) {
                 alert('no nft selected to stake')
                 return;
             }
@@ -95,16 +115,16 @@ const Stake = () => {
             await approveTx.wait()
             stakeNfts()
 
-        } catch(e) {
+        } catch (e) {
             setLoading(false)
             console.log(e)
         }
     }
 
-    const stakeNfts = async() => {
+    const stakeNfts = async () => {
         try {
             console.log(selectedNFTs)
-            if(selectedNFTs.length === 0) {
+            if (selectedNFTs.length === 0) {
                 alert('no nft selected to stake')
                 return;
             }
@@ -123,7 +143,7 @@ const Stake = () => {
             setSelectedNFTs([])
             clearCheckboxes()
 
-        } catch(e) {
+        } catch (e) {
             setLoading(false)
             setSelectedNFTs([])
             clearCheckboxes()
@@ -132,24 +152,55 @@ const Stake = () => {
 
     }
 
+    const unStake = async() => {
+        try {
+            console.log(selectedStNFTs)
+            if (selectedStNFTs.length === 0) {
+                alert('no nft selected to unstake')
+                return;
+            }
+            const signer = web3Provider.getSigner()
+            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT_ADDRESS, contractABI, signer)
+            const estimateGas = await stakingContract.estimateGas._unstakeMany(selectedStNFTs)
+            console.log(estimateGas.toString())
+            const tx = {
+                gasLimit: estimateGas.toString()
+            }
+            const stakingTx = await stakingContract._unstakeMany(selectedStNFTs, tx)
+            await stakingTx.wait()
+            setFetchNfts(true)
+            setLoading(false)
+            alert('staking done')
+            setSelectedStNFTs([])
+            clearCheckboxes()
+
+        } catch (e) {
+            setLoading(false)
+            setSelectedStNFTs([])
+            clearCheckboxes()
+            console.log(e)
+        }
+    }
+
+
     return (
         <>
             <section className="stake-and-earn-connected wf-section">
                 <h2 data-w-id="638e3a75-1253-8367-0636-0a1cb9fe5d04" style={style1} className="main-title connected">STAKE and earn</h2>
-                <div data-w-id="584c57f4-5178-0bf2-1a84-17853597b257" style={{opacity: 0}} className="tabs-holder">
+                <div data-w-id="584c57f4-5178-0bf2-1a84-17853597b257" style={{ opacity: 0 }} className="tabs-holder">
                     <div data-w-id="002cffd5-e811-2ac9-941c-bdffec8f43b8" className="stake-tabs mynfts">my nfts</div>
                     <div data-w-id="d91d0851-0831-1435-1930-c2284add1765" className="stake-tabs stakes-tab">staked</div>
                 </div>
                 <div className="stake-nfts">
-                    { nfts && nfts.ownedNfts.map((nft, i) => {
-                        if(i < nfts.ownedNfts.length - 1) {
+                    {nfts && nfts.ownedNfts.map((nft, i) => {
+                        if (i < nfts.ownedNfts.length - 1) {
                             return (
                                 <div key={i} className="nft-row">
                                     <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.id.tokenId)}>
-                                        <img src="images/tick.svg" style={{pointerEvents: "none", display: "none"}} loading="lazy" alt="" className="image-tick"/>
+                                        <img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" />
                                     </div>
                                     <div className="nft-image">
-                                        <img src={nft.media[0].gateway} loading="lazy" style={style2} alt="" className="image-nft-stake"/>
+                                        <img src={nft.media[0].gateway} loading="lazy" style={style2} alt="" className="image-nft-stake" />
                                     </div>
                                     <div className="nft-id">{nft.title}</div>
                                     <div className="white-detail-line"></div>
@@ -159,10 +210,10 @@ const Stake = () => {
                             return (
                                 <div key={i} className="nft-row last">
                                     <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.id.tokenId)}>
-                                        <img src="images/tick.svg" style={{pointerEvents: "none" , display: "none"}} loading="lazy" alt="" className="image-tick"/>
+                                        <img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" />
                                     </div>
                                     <div className="nft-image">
-                                        <img src={nft.media[0].gateway} loading="lazy" width="76" alt=""/>
+                                        <img src={nft.media[0].gateway} loading="lazy" width="76" alt="" />
                                     </div>
                                     <div className="nft-id">{nft.title}</div>
                                     <div className="white-detail-line"></div>
@@ -180,89 +231,69 @@ const Stake = () => {
                     }
                 </div>
                 <div className="staked">
-                    <div className="nft-row">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt="" className="image-16"/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                    </div>
-                    <div className="nft-row">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt=""/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                    </div>
-                    <div className="nft-row">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt=""/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                    </div>
-                    <div className="nft-row">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt=""/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                    </div>
-                    <div className="nft-row">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt=""/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                    </div>
-                    <div className="nft-row last">
-                        <div className="check-box-holder"><img src="images/tick.svg" loading="lazy" alt="" className="image-tick"/></div>
-                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt=""/></div>
-                        <div className="nft-id">#7480</div>
-                        <div className="staked-info">
-                            <div className="staked-for">STAKED FOR 30 days</div>
-                            <div className="earning">earning 5%</div>
-                        </div>
-                        <div className="white-detail-line"></div>
-                        <div className="white-detail-line bottom"></div>
-                    </div>
+                    {stNfts && (
+                        stNfts.map((nft, i) => {
+                            if (i < stNfts.length - 1) {
+                                return (
+                                    <div key={i} className="nft-row">
+                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
+                                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt="" className="image-16" /></div>
+                                        <div className="nft-id">#{nft.toString()}</div>
+                                        {/* <div className="staked-info">
+                                            <div className="staked-for">STAKED FOR 30 days</div>
+                                            <div className="earning">earning 5%</div>
+                                        </div> */}
+                                        <div className="white-detail-line"></div>
+                                    </div>
+                                )
+                            } else {
+                                return (
+                                    <div key={i} className="nft-row last">
+                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
+                                        <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt="" /></div>
+                                        <div className="nft-id">#{nft.toString()}</div>
+                                        {/* <div className="staked-info">
+                                            <div className="staked-for">STAKED FOR 30 days</div>
+                                            <div className="earning">earning 5%</div>
+                                        </div> */}
+                                        <div className="white-detail-line"></div>
+                                        <div className="white-detail-line bottom"></div>
+                                    </div>
+                                )
+                            }
+                        })
+                    )}
+                    {
+                        stNfts.length === 0 && (
+                            <div className="nft-row">
+                                <p className="tw-text-white tw-mt-4">No Nfts staked</p>
+                            </div>
+                        )
+                    }
+
+
                 </div>
             </section>
-            <footer data-w-id="1c6363c1-60a3-5681-8671-51603099bdca" style={{opacity: 0}} className="footer stake wf-section">
+            <footer data-w-id="1c6363c1-60a3-5681-8671-51603099bdca" style={{ opacity: 0 }} className="footer stake wf-section">
                 <div className="stake-period-holder">
                     <div className="hero-line left"></div>
                     <div className="typo-stake-period">choose staking period in days</div>
                     <div className="button-days-holder">
-                        <div className={classNames('button-nav-small days', {'active': selectedPeriod == 0})} onClick={e=> setSelectedPeriod(0)}>
+                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 0 })} onClick={e => setSelectedPeriod(0)}>
                             <div className="typo-days">30</div>
                         </div>
-                        <div className={classNames('button-nav-small days', {'active': selectedPeriod == 1})} onClick={e=> setSelectedPeriod(1)}>
+                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
                             <div className="typo-days">60</div>
                         </div>
-                        <div className={classNames('button-nav-small days', {'active': selectedPeriod == 2})} onClick={e=> setSelectedPeriod(2)}>
+                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
                             <div className="typo-days">90</div>
                         </div>
-                        <div className={classNames('button-nav-small days', {'active': selectedPeriod == 3})} onClick={e=> setSelectedPeriod(3)}>
+                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
                             <div className="typo-days">120</div>
                         </div>
                     </div>
-                    <a data-w-id="e2b7a820-35a6-06f6-ec66-f0b4a902d6fc" style={{opacity: 0}} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
-                    <a data-w-id="a320d48d-3cfa-a880-0e58-e1b68e7768dc" style={{opacity: 0}} href="#" className="button-unstake w-button">unstake</a>
+                    <a data-w-id="e2b7a820-35a6-06f6-ec66-f0b4a902d6fc" style={{ opacity: 0 }} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
+                    <a data-w-id="a320d48d-3cfa-a880-0e58-e1b68e7768dc" style={{ opacity: 0 }} href="#" className="button-unstake w-button" onClick={unStake}>unstake</a>
                     <div className="hero-line"></div>
                 </div>
                 <div className="container footer-mobile w-container">
@@ -272,7 +303,7 @@ const Stake = () => {
                     </div>
                     <div className="footer-copyright">
                         <p className="typo-footer hidden">PRIVACY POLICY — TERMS OF USE</p>
-                        <p className="typo-footer dark">©2022 - Rising Sun.<br/>All rights reserved.</p>
+                        <p className="typo-footer dark">©2022 - Rising Sun.<br />All rights reserved.</p>
                     </div>
                     <div className="footer-links">
                         <p className="typo-footer dark">FOLLOW US AND JOIN THE CLUB</p>
@@ -300,21 +331,21 @@ const Stake = () => {
                 <div className="hero-line left"></div>
                 <div className="typo-stake-period">choose staking period in days</div>
                 <div className="button-days-holder">
-                    <div className={classNames('button-nav-small days', {'active': selectedPeriod == 0})} onClick={e=> setSelectedPeriod(0)}>
+                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 0 })} onClick={e => setSelectedPeriod(0)}>
                         <div className="typo-days">30</div>
                     </div>
-                    <div className={classNames('button-nav-small days', {'active': selectedPeriod == 1})} onClick={e=> setSelectedPeriod(1)}>
+                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
                         <div className="typo-days">60</div>
                     </div>
-                    <div className={classNames('button-nav-small days', {'active': selectedPeriod == 2})} onClick={e=> setSelectedPeriod(2)}>
+                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
                         <div className="typo-days">90</div>
                     </div>
-                    <div className={classNames('button-nav-small days', {'active': selectedPeriod == 3})} onClick={e=> setSelectedPeriod(3)}>
+                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
                         <div className="typo-days">120</div>
                     </div>
                 </div>
-                <a data-w-id="e7892a29-86dd-8960-fe68-2193ff2d4865" style={{opacity: 0}} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
-                <a data-w-id="d1f62f78-ab19-2899-d55d-9a0983a461a4" style={{opacity: 0}} href="#" className="button-unstake w-button">unstake</a>
+                <a data-w-id="e7892a29-86dd-8960-fe68-2193ff2d4865" style={{ opacity: 0 }} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
+                <a data-w-id="d1f62f78-ab19-2899-d55d-9a0983a461a4" style={{ opacity: 0 }} href="#" className="button-unstake w-button" onClick={unStake}>unstake</a>
                 <div className="hero-line"></div>
             </div>
             <div className="footer-madeby mobile">
