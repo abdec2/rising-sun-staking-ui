@@ -12,10 +12,10 @@ const Header = () => {
                         </a>
                     </div>
                     <div className="nav-middle-holder">
-                        <a href="index.html" className="nav-links w-nav-link">Home</a>
-                        <a href="why-us.html" className="nav-links w-nav-link">why us</a>
-                        <a href="documents/Rising-Sun---Whitepaper.pdf" target="_blank" className="nav-links w-nav-link">whitepaper</a>
-                        <a href="documents/RisingSun-audit-report.pdf" target="_blank" className="nav-links w-nav-link">audit report</a>
+                        <a href="https://www.risingsuncoin.io/" className="nav-links w-nav-link">Home</a>
+                        <a href="https://www.risingsuncoin.io/why-us" className="nav-links w-nav-link">why us</a>
+                        <a href="https://assets.website-files.com/623ce2bcd0ab4f85b6e43d32/628590c0bfb7b073ad413b70_RisingSun-Whitepaper.pdf" target="_blank" className="nav-links w-nav-link">whitepaper</a>
+                        <a href="https://assets.website-files.com/623ce2bcd0ab4f85b6e43d32/628590bf02d01e693dafb9ee_RisingSun-audit-report.pdf" target="_blank" className="nav-links w-nav-link">audit report</a>
                     </div>
                     <div data-w-id="734b1a8e-b06e-4071-ebd2-3c94b45ac66d" className="menu-button w-nav-button"><img src="images/image---Menu-icon.svg" loading="lazy" alt=""/><img src="images/image-X.svg" loading="lazy" alt="" className="image-13"/></div>
                         <nav role="navigation" className="nav-menu w-nav-menu">
@@ -25,9 +25,9 @@ const Header = () => {
                                     <div className="typo-buysun">BUY $SUN</div>
                                 </a>
                                 <div className="nav-link-holder-mobile">
-                                    <a href="#" className="nav-links w-nav-link">Home</a>
-                                    <a href="#" className="nav-links middle w-nav-link">why us</a>
-                                    <a href="#" className="nav-links w-nav-link">whitepaper</a>
+                                    <a href="https://www.risingsuncoin.io/" className="nav-links w-nav-link">Home</a>
+                                    <a href="https://www.risingsuncoin.io/why-us" className="nav-links middle w-nav-link">why us</a>
+                                    <a href="https://assets.website-files.com/623ce2bcd0ab4f85b6e43d32/628590c0bfb7b073ad413b70_RisingSun-Whitepaper.pdf" className="nav-links w-nav-link">whitepaper</a>
                                 </div>
                                 <div className="div-block-8">
                                     <p className="typo-nav-mobile">follow us and join the club</p>
@@ -54,10 +54,10 @@ const Header = () => {
                                 <div className="typo-buysun">BUY $SUN</div>
                             </a>
                             <div className="mobile-link-holder">
-                                <a href="index.html" className="link-mobile-nav">Home</a>
-                                <a href="why-us.html" className="link-mobile-nav mid">why us</a>
-                                <a href="documents/Rising-Sun---Whitepaper.pdf" target="_blank" className="link-mobile-nav mid">whitepaper</a>
-                                <a href="documents/RisingSun-audit-report.pdf" target="_blank" className="link-mobile-nav">audit report</a>
+                                <a href="https://www.risingsuncoin.io/" className="link-mobile-nav">Home</a>
+                                <a href="https://www.risingsuncoin.io/why-us" className="link-mobile-nav mid">why us</a>
+                                <a href="https://assets.website-files.com/623ce2bcd0ab4f85b6e43d32/628590c0bfb7b073ad413b70_RisingSun-Whitepaper.pdf" target="_blank" className="link-mobile-nav mid">whitepaper</a>
+                                <a href="https://assets.website-files.com/623ce2bcd0ab4f85b6e43d32/628590bf02d01e693dafb9ee_RisingSun-audit-report.pdf" target="_blank" className="link-mobile-nav">audit report</a>
                             </div>
                             <div className="social-mobile-nav">
                                 <p className="typo-nav-mobile">FOLLOW US AND JOIN THE CLUB</p>
