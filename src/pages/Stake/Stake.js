@@ -53,27 +53,29 @@ const Stake = () => {
 
     console.log(stNfts)
     const checkBoxClick = (e, tokenId) => {
-        console.log(parseInt(tokenId, 16))
+        const token_id = tokenId.toString();
+        console.log(parseInt(token_id))
         const imageDisplay = e.target.querySelector('img').style.display;
         if (imageDisplay !== "none") {
             e.target.querySelector('img').style.display = "none"
-            setSelectedNFTs([...selectedNFTs.filter(nft => nft !== parseInt(tokenId, 16))])
+            setSelectedNFTs([...selectedNFTs.filter(nft => nft !== parseInt(token_id))])
         } else {
             e.target.querySelector('img').style.display = "block"
-            setSelectedNFTs([...selectedNFTs, parseInt(tokenId, 16)])
+            setSelectedNFTs([...selectedNFTs, parseInt(token_id)])
         }
     }
 
 
     const checkBoxClickStaked = (e, tokenId) => {
-        console.log(parseInt(tokenId, 16))
+        const token_id = tokenId.toString();
+        console.log(parseInt(token_id))
         const imageDisplay = e.target.querySelector('img').style.display;
         if (imageDisplay !== "none") {
             e.target.querySelector('img').style.display = "none"
-            setSelectedStNFTs([...selectedStNFTs.filter(nft => nft !== parseInt(tokenId, 16))])
+            setSelectedStNFTs([...selectedStNFTs.filter(nft => nft !== parseInt(token_id))])
         } else {
             e.target.querySelector('img').style.display = "block"
-            setSelectedStNFTs([...selectedStNFTs, parseInt(tokenId, 16)])
+            setSelectedStNFTs([...selectedStNFTs, parseInt(token_id)])
         }
     }
 
