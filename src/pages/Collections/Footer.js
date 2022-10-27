@@ -1,5 +1,5 @@
-
 const FooterComponent = () => {
+    
     return (
         <>
             <footer data-w-id="211ac871-0edb-5c92-fccb-95dc2336d4ad" style={{opacity: 0}} className="footer wf-section">

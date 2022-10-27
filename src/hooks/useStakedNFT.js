@@ -10,7 +10,12 @@ const useStakedNFT = (provider, account, fetchNFTs, setFetchNfts) => {
             const signer = provider.getSigner()
             const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT_ADDRESS, contractABI, signer)
             const staked_Tokens = await stakingContract.getUserStakedTokens(account)
-            setStakedTokens(staked_Tokens)
+            const tokenArray = await Promise.all(staked_Tokens.map(async item => {
+                const tokenObject = await stakingContract.vault(item.toString())
+                return tokenObject
+            }))
+            
+            setStakedTokens(tokenArray)
             setFetchNfts(false)
     }
  

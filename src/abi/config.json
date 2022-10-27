@@ -1,7 +1,13 @@
 {
-    "STAKING_CONTRACT_ADDRESS": "0x765dc3F14F681E73CBAcc64dd2bAb8b8d2a1c2Af",
-    "NFT_CONTRACT": "0x7340E290f9bE98E879200E53DA75469Eb2F5CA42",
-    "NETWORK_ID": 1, 
-    "BLOCKCHAIN_EXPLORER": "https://etherscan.io/",
-    "NETWORK" : "Ethereum Mainnet" 
+    "STAKING_CONTRACT" : {
+        "SDS_SUN" : "0x2bC0a3D83095257053104Cd8c8CBc627b5D73E83",
+        "SDS_BNB" : "",
+        "SHD2_SUN" : "",
+        "SHD2_BNB" : ""
+    },
+    "STAKING_CONTRACT_ADDRESS": "0x2bC0a3D83095257053104Cd8c8CBc627b5D73E83",
+    "NFT_CONTRACT": "0x4496f5bB73620Ef028886Ca04CE6d7ff29b4968e",
+    "NETWORK_ID": 5, 
+    "BLOCKCHAIN_EXPLORER": "https://goerli.etherscan.io/",
+    "NETWORK" : "Goerli Testnet" 
 }

@@ -12,6 +12,8 @@ import LoadingComponent from "../../components/LoadingComponent"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
+import StakeTimerComponent from "../../components/StakeTimerComponent";
+
 const MySwal = withReactContent(Swal)
 
 const style1 = {
@@ -40,7 +42,7 @@ const style3 = {
     opacity: 0
 }
 
-const Stake = () => {
+const Stake = ({rewardType, collection}) => {
     const { account, web3Provider } = useContext(GlobalContext)
     const [fetchNFTs, setFetchNfts] = useState(true)
     const nfts = useFetchNFT(account, fetchNFTs, setFetchNfts)
@@ -49,6 +51,8 @@ const Stake = () => {
     const [loading, setLoading] = useState(false)
     const [selectedNFTs, setSelectedNFTs] = useState([])
     const [selectedStNFTs, setSelectedStNFTs] = useState([])
+
+    console.log(rewardType, collection)
 
 
     console.log(stNfts)
@@ -291,9 +295,13 @@ const Stake = () => {
                             if (i < stNfts.length - 1) {
                                 return (
                                     <div key={i} className="nft-row">
-                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
+                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft.tokenId)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
                                         <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt="" className="image-16" /></div>
-                                        <div className="nft-id">#{nft.toString()}</div>
+                                        <div className="nft-id">#{nft.tokenId.toString()}</div>
+                                        <div className="tw-text-white tw-ml-10">
+                                            <StakeTimerComponent startDate={nft.timestamp} />
+                                        </div>
+
                                         {/* <div className="staked-info">
                                             <div className="staked-for">STAKED FOR 30 days</div>
                                             <div className="earning">earning 5%</div>
@@ -304,9 +312,13 @@ const Stake = () => {
                             } else {
                                 return (
                                     <div key={i} className="nft-row last">
-                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
+                                        <div className="check-box-holder" onClick={e => checkBoxClickStaked(e, nft.tokenId)}><img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" /></div>
                                         <div className="nft-image"><img src="images/coffen.png" loading="lazy" width="55" alt="" /></div>
-                                        <div className="nft-id">#{nft.toString()}</div>
+                                        <div className="nft-id">#{nft.tokenId.toString()}</div>
+                                        <div className="tw-text-white tw-ml-10">
+                                            <StakeTimerComponent startDate={nft.timestamp} />
+                                        </div>
+
                                         {/* <div className="staked-info">
                                             <div className="staked-for">STAKED FOR 30 days</div>
                                             <div className="earning">earning 5%</div>

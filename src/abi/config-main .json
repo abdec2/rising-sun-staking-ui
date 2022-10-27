@@ -1,0 +1,8 @@
+{
+    "STAKING_CONTRACT_ADDRESS": "0x765dc3F14F681E73CBAcc64dd2bAb8b8d2a1c2Af",
+    "NFT_CONTRACT": "0x7340E290f9bE98E879200E53DA75469Eb2F5CA42",
+    "NETWORK_ID": 1, 
+    "BLOCKCHAIN_EXPLORER": "https://etherscan.io/",
+    "NETWORK" : "Ethereum Mainnet" 
+}
+

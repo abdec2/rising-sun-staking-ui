@@ -2,7 +2,7 @@ import HeaderComponent from "./Header";
 import Stake from "./Stake";
 import { useEffect } from "react";
 
-const StakePage = ({ setError, setErrMsg }) => {
+const StakePage = ({ setError, setErrMsg, rewardType, collection }) => {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-wf-page', '626bab4ccdd51fce15800bf6')
@@ -15,7 +15,7 @@ const StakePage = ({ setError, setErrMsg }) => {
   return (
     <>
       <HeaderComponent />
-      <Stake />
+      <Stake rewardType={rewardType} collection={collection} />
     </>
   );
 };

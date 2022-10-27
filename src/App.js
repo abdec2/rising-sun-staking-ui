@@ -5,8 +5,13 @@ import StakePage from './pages/Stake'
 
 import AlertBox from "./components_old/AlertBox";
 import { useContext } from "react";
+import { useLocation } from "react-router-dom";
 
 function App() {
+  
+  const location = useLocation()
+  const {rewardType, collection} = location.state
+  
   const {account} = useContext(GlobalContext)
   const [error, setError] = useState(false);
   const [errMsg, setErrMsg] = useState('');
@@ -24,7 +29,7 @@ function App() {
 
   return (
     <>
-      {account ? (<StakePage setError={setError} setErrMsg={setErrMsg} />) : (<Homepage setError={setError} setErrMsg={setErrMsg} />)}
+      {account ? (<StakePage setError={setError} setErrMsg={setErrMsg} rewardType={rewardType} collection={collection}  />) : (<Homepage setError={setError} setErrMsg={setErrMsg} />)}
 
       {error && (<AlertBox msg={errMsg} />)}
     </>
