@@ -240,6 +240,14 @@ const Stake = ({rewardType, collection}) => {
         }
     }
 
+    const handleImageUri = (imageUri) => {
+        let Image = imageUri
+        if(imageUri.startsWith('ipfs://')) {
+            Image = `https://ipfs.io/ipfs/${Image.split('ipfs://')[1]}`
+        }
+        return Image
+    }
+
 
     return (
         <>
@@ -251,30 +259,30 @@ const Stake = ({rewardType, collection}) => {
                     <div data-w-id="d91d0851-0831-1435-1930-c2284add1765" className="stake-tabs stakes-tab">staked</div>
                 </div>
                 <div className="stake-nfts">
-                    {nfts && nfts.ownedNfts.map((nft, i) => {
-                        if (i < nfts.ownedNfts.length - 1) {
+                    {nfts && nfts.map((nft, i) => {
+                        if (i < nfts.length - 1) {
                             return (
                                 <div key={i} className="nft-row">
-                                    <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.id.tokenId)}>
+                                    <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.tokenId)}>
                                         <img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" />
                                     </div>
                                     <div className="nft-image">
-                                        <img src={nft.media[0].gateway} loading="lazy" style={style2} alt="" className="image-nft-stake" />
+                                        <img src={handleImageUri(nft.image)} loading="lazy" style={style2} alt="" className="image-nft-stake" />
                                     </div>
-                                    <div className="nft-id">{nft.title}</div>
+                                    <div className="nft-id">{nft.name}</div>
                                     <div className="white-detail-line"></div>
                                 </div>
                             )
                         } else {
                             return (
                                 <div key={i} className="nft-row last">
-                                    <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.id.tokenId)}>
+                                    <div className="check-box-holder" onClick={e => checkBoxClick(e, nft.tokenId)}>
                                         <img src="images/tick.svg" style={{ pointerEvents: "none", display: "none" }} loading="lazy" alt="" className="image-tick" />
                                     </div>
                                     <div className="nft-image">
-                                        <img src={nft.media[0].gateway} loading="lazy" width="76" alt="" />
+                                        <img src={handleImageUri(nft.image)} loading="lazy" width="76" alt="" />
                                     </div>
-                                    <div className="nft-id">{nft.title}</div>
+                                    <div className="nft-id">{nft.name}</div>
                                     <div className="white-detail-line"></div>
                                     <div className="white-detail-line bottom"></div>
                                 </div>
