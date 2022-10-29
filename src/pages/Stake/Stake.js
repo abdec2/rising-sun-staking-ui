@@ -45,7 +45,7 @@ const style3 = {
 const Stake = ({rewardType, collection}) => {
     const { account, web3Provider } = useContext(GlobalContext)
     const [fetchNFTs, setFetchNfts] = useState(true)
-    const nfts = useFetchNFT(account, fetchNFTs, setFetchNfts)
+    const nfts = useFetchNFT(account, fetchNFTs, setFetchNfts, rewardType, collection)
     const stNfts = useStakedNFT(web3Provider, account, fetchNFTs, setFetchNfts)
     const [selectedPeriod, setSelectedPeriod] = useState(0);
     const [loading, setLoading] = useState(false)

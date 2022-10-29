@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CONFIG from './../abi/config.json'
 import ABI from './../abi/nft.json'
 
-const useFetchNFT = (account, fetchNFTs, setFetchNFTs) => {
+const useFetchNFT = (account, fetchNFTs, setFetchNFTs, rewardType, collection) => {
     const [nft, setNFT] = useState(null)
     const fetchWalletNFTs = async (account) => {
         try {
@@ -16,8 +16,10 @@ const useFetchNFT = (account, fetchNFTs, setFetchNFTs) => {
                 // const response = await nfts.json();
                 // setNFT(response)
                 // setFetchNFTs(false)
+                const nftContractKey = `${collection.toUpperCase()}_${rewardType.toUpperCase()}`;
+                console.log(nftContractKey) 
                 const provider = new ethers.providers.Web3Provider(window.ethereum)
-                const contract = new ethers.Contract(CONFIG.NFT_CONTRACT, ABI, provider)
+                const contract = new ethers.Contract(CONFIG.NFT_CONTRACT[collection.toUpperCase()], ABI, provider)
                 const nfts = await contract.walletOfOwner(account)
                 let baseUri = await contract.baseURI()
                 if (baseUri.startsWith('ipfs://')) {
