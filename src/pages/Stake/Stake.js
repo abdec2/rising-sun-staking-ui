@@ -243,7 +243,7 @@ const Stake = ({rewardType, collection}) => {
     const handleImageUri = (imageUri) => {
         let Image = imageUri
         if(imageUri.startsWith('ipfs://')) {
-            Image = `https://ipfs.io/ipfs/${Image.split('ipfs://')[1]}`
+            Image = `https://gateway.pinata.cloud/ipfs/${Image.split('ipfs://')[1]}`
         }
         return Image
     }

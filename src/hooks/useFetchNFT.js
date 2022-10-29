@@ -21,7 +21,7 @@ const useFetchNFT = (account, fetchNFTs, setFetchNFTs) => {
                 const nfts = await contract.walletOfOwner(account)
                 let baseUri = await contract.baseURI()
                 if (baseUri.startsWith('ipfs://')) {
-                    baseUri = `https://ipfs.io/ipfs/${baseUri.split('ipfs://')[1]}`
+                    baseUri = `https://gateway.pinata.cloud/ipfs/${baseUri.split('ipfs://')[1]}`
                 }
                 console.log(baseUri)
                 const metadata = await Promise.all(nfts.map(async item => {
