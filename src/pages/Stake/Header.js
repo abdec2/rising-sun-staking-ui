@@ -4,7 +4,7 @@ const Header = () => {
     <>
             <div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" className="navbar-2 w-nav">
                 <div className="container nav w-container">
-                    <a href="index.html" className="brand w-nav-brand"><img src="images/image-risingsun-logo.svg" loading="lazy" width="115" alt="Rising sun logo"/></a>
+                    <a href="/" className="brand w-nav-brand"><img src="images/image-risingsun-logo.svg" loading="lazy" width="115" alt="Rising sun logo"/></a>
                     <div className="nav-left-holder">
                         <a href="https://app.uniswap.org/#/swap?outputCurrency=0x50522c769e01eb06c02bd299066509d8f97a69ae&amp;chain=mainnet" target="_blank" className="button-nav-big w-inline-block">
                             <div className="image-star"><img src="images/fox.svg" loading="lazy" alt=""/></div>
@@ -77,7 +77,7 @@ const Header = () => {
                         <div className="background"></div>
                     </div>
                     <div className="nav-mobile">
-                        <a href="#" className="logo-link w-inline-block"><img src="images/image-risingsun-logo.svg" loading="lazy" alt="Rising sun logo"/></a>
+                        <a href="/" className="logo-link w-inline-block"><img src="images/image-risingsun-logo.svg" loading="lazy" alt="Rising sun logo"/></a>
                         <div data-w-id="d82c271c-c7ca-0d55-ab3e-adddf2873813" className="hamburger-menu"><img src="images/image-X.svg" loading="lazy" alt="" className="image-15"/><img src="images/image---Menu-icon.svg" loading="lazy" alt="" className="image-14"/></div>
                         </div>
                     </>

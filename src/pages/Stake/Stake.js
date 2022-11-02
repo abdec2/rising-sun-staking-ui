@@ -5,6 +5,7 @@ import useFetchNFT from "../../hooks/useFetchNFT"
 import { ethers } from "ethers"
 import CONFIG from './../../abi/config.json'
 import contractABI from './../../abi/abi.json'
+import { ABI } from './../../abi/abis'
 import nftAbi from './../../abi/nft.json'
 import useStakedNFT from "../../hooks/useStakedNFT"
 import LoadingComponent from "../../components/LoadingComponent"
@@ -42,11 +43,11 @@ const style3 = {
     opacity: 0
 }
 
-const Stake = ({rewardType, collection}) => {
+const Stake = ({ rewardType, collection }) => {
     const { account, web3Provider } = useContext(GlobalContext)
     const [fetchNFTs, setFetchNfts] = useState(true)
     const nfts = useFetchNFT(account, fetchNFTs, setFetchNfts, rewardType, collection)
-    const stNfts = useStakedNFT(web3Provider, account, fetchNFTs, setFetchNfts)
+    const stNfts = useStakedNFT(web3Provider, account, fetchNFTs, setFetchNfts, rewardType, collection)
     const [selectedPeriod, setSelectedPeriod] = useState(0);
     const [loading, setLoading] = useState(false)
     const [selectedNFTs, setSelectedNFTs] = useState([])
@@ -96,8 +97,8 @@ const Stake = ({rewardType, collection}) => {
         try {
             setLoading(true)
             const signer = web3Provider.getSigner()
-            const nftContract = new ethers.Contract(CONFIG.NFT_CONTRACT, nftAbi, signer)
-            const isApproval = await nftContract.isApprovedForAll(account, CONFIG.STAKING_CONTRACT_ADDRESS)
+            const nftContract = new ethers.Contract(CONFIG.NFT_CONTRACT[collection.toUpperCase()], nftAbi, signer)
+            const isApproval = await nftContract.isApprovedForAll(account, CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`])
             if (isApproval) {
                 stakeNfts()
             } else {
@@ -126,14 +127,14 @@ const Stake = ({rewardType, collection}) => {
                 return;
             }
             const signer = web3Provider.getSigner()
-            const nftContract = new ethers.Contract(CONFIG.NFT_CONTRACT, nftAbi, signer)
-            const estimateGas = await nftContract.estimateGas.setApprovalForAll(CONFIG.STAKING_CONTRACT_ADDRESS, true)
+            const nftContract = new ethers.Contract(CONFIG.NFT_CONTRACT[collection.toUpperCase()], nftAbi, signer)
+            const estimateGas = await nftContract.estimateGas.setApprovalForAll(CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`], true)
             console.log(estimateGas.toString())
             const tx = {
                 gasLimit: estimateGas.toString()
             }
 
-            const approveTx = await nftContract.setApprovalForAll(CONFIG.STAKING_CONTRACT_ADDRESS, true, tx)
+            const approveTx = await nftContract.setApprovalForAll(CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`], true, tx)
             await approveTx.wait()
             stakeNfts()
 
@@ -161,13 +162,25 @@ const Stake = ({rewardType, collection}) => {
                 return;
             }
             const signer = web3Provider.getSigner()
-            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT_ADDRESS, contractABI, signer)
-            const estimateGas = await stakingContract.estimateGas.stake(selectedNFTs, selectedPeriod)
+            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`], JSON.parse(ABI[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`]), signer)
+            let estimateGas;
+            if (rewardType.toLowerCase() === 'bnb') {
+                estimateGas = await stakingContract.estimateGas.stake(selectedNFTs)
+            } else {
+                estimateGas = await stakingContract.estimateGas.stake(selectedNFTs, selectedPeriod)
+            }
             console.log(estimateGas.toString())
             const tx = {
                 gasLimit: estimateGas.toString()
             }
-            const stakingTx = await stakingContract.stake(selectedNFTs, selectedPeriod, tx)
+
+            let stakingTx;
+            if (rewardType.toLowerCase() === 'bnb') {
+                stakingTx = await stakingContract.stake(selectedNFTs, tx)
+            } else {
+                stakingTx = await stakingContract.stake(selectedNFTs, selectedPeriod, tx)
+            }
+
             await stakingTx.wait()
             setFetchNfts(true)
             setLoading(false)
@@ -192,7 +205,7 @@ const Stake = ({rewardType, collection}) => {
 
     }
 
-    const unStake = async() => {
+    const unStake = async () => {
         try {
             setLoading(true)
             console.log(selectedStNFTs)
@@ -210,7 +223,7 @@ const Stake = ({rewardType, collection}) => {
                 return;
             }
             const signer = web3Provider.getSigner()
-            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT_ADDRESS, contractABI, signer)
+            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`], JSON.parse(ABI[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`]), signer)
             const estimateGas = await stakingContract.estimateGas._unstakeMany(selectedStNFTs)
             console.log(estimateGas.toString())
             const tx = {
@@ -242,10 +255,64 @@ const Stake = ({rewardType, collection}) => {
 
     const handleImageUri = (imageUri) => {
         let Image = imageUri
-        if(imageUri.startsWith('ipfs://')) {
-            Image = `https://gateway.pinata.cloud/ipfs/${Image.split('ipfs://')[1]}`
+        if (imageUri.startsWith('ipfs://')) {
+            Image = `https://ipfs.io/ipfs/${Image.split('ipfs://')[1]}`
         }
         return Image
+    }
+
+    const handleClaim = async () => {
+        try {
+            if (selectedStNFTs.length === 0) {
+                MySwal.fire({
+                    position: 'top-end',
+                    title: 'Error!',
+                    text: 'No nft selected to claim',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                // alert('no nft selected to unstake')
+                setLoading(false)
+                return;
+            }
+
+            if (rewardType.toLowerCase() === 'sun' && collection.toLowerCase() === 'sds') {
+                MySwal.fire({
+                    position: 'top-end',
+                    title: 'Error',
+                    text: 'Method not available',
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                return
+            }
+
+            setLoading(true)
+            const signer = web3Provider.getSigner()
+            const stakingContract = new ethers.Contract(CONFIG.STAKING_CONTRACT[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`], JSON.parse(ABI[`${collection.toUpperCase()}_${rewardType.toUpperCase()}`]), signer)
+            const estimateGas = await stakingContract.estimateGas.claimRewards(selectedStNFTs)
+            console.log(estimateGas.toString())
+            const tx = {
+                gasLimit: estimateGas.toString()
+            }
+            const stakingTx = await stakingContract.claimRewards(selectedStNFTs, tx)
+            await stakingTx.wait()
+            setLoading(false)
+            MySwal.fire({
+                position: 'top-end',
+                title: 'success',
+                text: 'Rewards claimed successfully!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            })
+
+        } catch (e) {
+            setLoading(false)
+            console.log(e)
+        }
     }
 
 
@@ -357,18 +424,25 @@ const Stake = ({rewardType, collection}) => {
                         <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 0 })} onClick={e => setSelectedPeriod(0)}>
                             <div className="typo-days">30</div>
                         </div>
-                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
-                            <div className="typo-days">60</div>
-                        </div>
-                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
-                            <div className="typo-days">90</div>
-                        </div>
-                        <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
-                            <div className="typo-days">120</div>
-                        </div>
+                        {
+                            (rewardType.toLowerCase() !== "bnb") ? (
+                                <>
+                                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
+                                        <div className="typo-days">60</div>
+                                    </div>
+                                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
+                                        <div className="typo-days">90</div>
+                                    </div>
+                                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
+                                        <div className="typo-days">120</div>
+                                    </div>
+                                </>
+                            ) : ''
+                        }
                     </div>
                     <a data-w-id="e2b7a820-35a6-06f6-ec66-f0b4a902d6fc" style={{ opacity: 0 }} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
                     <a data-w-id="a320d48d-3cfa-a880-0e58-e1b68e7768dc" style={{ opacity: 0 }} href="#" className="button-unstake w-button" onClick={unStake}>unstake</a>
+                    <a data-w-id="a320d48d-3cfa-a880-0e58-e1b68e7768dc" style={{ opacity: 0 }} href="#" className="button-unstake w-button tw-ml-2" onClick={handleClaim}>claim</a>
                     <div className="hero-line"></div>
                 </div>
                 <div className="container footer-mobile w-container">
@@ -409,18 +483,26 @@ const Stake = ({rewardType, collection}) => {
                     <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 0 })} onClick={e => setSelectedPeriod(0)}>
                         <div className="typo-days">30</div>
                     </div>
-                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
-                        <div className="typo-days">60</div>
-                    </div>
-                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
-                        <div className="typo-days">90</div>
-                    </div>
-                    <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
-                        <div className="typo-days">120</div>
-                    </div>
+                    {
+                        (rewardType.toLowerCase() !== "bnb") ? (
+                            <>
+                                <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 1 })} onClick={e => setSelectedPeriod(1)}>
+                                    <div className="typo-days">60</div>
+                                </div>
+                                <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 2 })} onClick={e => setSelectedPeriod(2)}>
+                                    <div className="typo-days">90</div>
+                                </div>
+                                <div className={classNames('button-nav-small days', { 'active': selectedPeriod == 3 })} onClick={e => setSelectedPeriod(3)}>
+                                    <div className="typo-days">120</div>
+                                </div>
+                            </>
+                        ) : ''
+                    }
                 </div>
                 <a data-w-id="e7892a29-86dd-8960-fe68-2193ff2d4865" style={{ opacity: 0 }} href="#" className="button-stake w-button" onClick={checkApproval}>STAKE MY NFTs</a>
                 <a data-w-id="d1f62f78-ab19-2899-d55d-9a0983a461a4" style={{ opacity: 0 }} href="#" className="button-unstake w-button" onClick={unStake}>unstake</a>
+                <a data-w-id="d1f62f78-ab19-2899-d55d-9a0983a461a4" style={{ opacity: 0 }} href="#" className="button-unstake w-button tw-mt-3" onClick={handleClaim}>claim</a>
+
                 <div className="hero-line"></div>
             </div>
             <div className="footer-madeby mobile">

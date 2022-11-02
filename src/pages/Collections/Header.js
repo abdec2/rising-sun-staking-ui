@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 const HeaderComponent = () => {
     return (
         <>
@@ -31,12 +33,12 @@ const HeaderComponent = () => {
                 <div className="background"></div>
             </div>
             <div className="nav-mobile">
-                <a href="https://www.risingsuncoin.io/" className="logo-link w-inline-block"><img src="/images/image-risingsun-logo.svg" loading="lazy" alt="Rising sun logo" /></a>
+                <Link to="/" className="logo-link w-inline-block"><img src="/images/image-risingsun-logo.svg" loading="lazy" alt="Rising sun logo" /></Link>
                 <div data-w-id="1a9ec6a6-1440-abf2-b71b-16a1f2030188" className="hamburger-menu"><img src="/images/image-X.svg" loading="lazy" alt="" className="image-15" /><img src="/images/image---Menu-icon.svg" loading="lazy" alt="" className="image-14" /></div>
             </div>
             <div data-w-id="370d074e-fda9-5545-cdd5-a2b93f2b0593" data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" className="navbar w-nav">
                 <div className="container nav w-container">
-                    <a href="https://www.risingsuncoin.io/" className="brand w-nav-brand"><img src="/images/image-risingsun-logo.svg" loading="lazy" width="115" alt="Rising sun logo" /></a>
+                    <Link to="/" className="brand w-nav-brand"><img src="/images/image-risingsun-logo.svg" loading="lazy" width="115" alt="Rising sun logo" /></Link>
                     <div className="nav-left-holder">
                         <a href="https://app.uniswap.org/#/swap?outputCurrency=0x50522c769e01eb06c02bd299066509d8f97a69ae&amp;chain=mainnet" target="_blank" className="button-nav-big w-inline-block">
                             <div className="image-star"><img src="/images/image-star-logo.svg" loading="lazy" alt="Rising Sun icon" /></div>
